@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Train Ticket</title>
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f7f8fc;
+        }
+        .ticket {
+            width: 350px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            background-color: #ffffff;
+            font-size: 14px;
+            color: #333;
+        }
+        .ticket-header {
+            padding: 16px;
+            background-color: #318653;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #ffffff;
+        }
+        .ticket-header h2 {
+            font-size: 20px;
+            margin: 0;
+        }
+        .ticket-header img {
+            width: 50px;
+            height: auto;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .ticket-header p {
+            font-size: 14px;
+        }
+        .ticket-body {
+            padding: 16px;
+            background-color: #ffffff;
+        }
+        .ticket-body h3 {
+            font-size: 18px;
+            color: #318653;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .ticket-body .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .ticket-body .info-row p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .ticket-body .info-row strong {
+            font-weight: bold;
+            color: #333;
+        }
+        .ticket-divider {
+            border-top: 1px dashed #e0e0e0;
+            margin: 16px 0;
+        }
+        .ticket-footer {
+            padding: 12px;
+            background-color: #f1f1f1;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+        .ticket-footer a {
+            color: #318653;
+            text-decoration: underline;
+        }
+        .ticket-footer a:hover {
+            color: #256440;
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket">
+        <div class="ticket-header">
+            <div style="display: flex; align-items: center;">
+                <!-- Local Image Path -->
+                <img src="/backend/templates/cholo_jai.png" alt="Logo">
+                <div>
+                    <h2>Cholo Jai</h2>
+                    <p>Ticket No: <strong>{{ticketId}}</strong></p>
+                </div>
+            </div>
+            <div>
+                <p>{{journeyDate}}</p>
+            </div>
+        </div>
+
+        <div class="ticket-body">
+            <h3>Route Details</h3>
+            <div class="info-row">
+                <p>Train Name:</p>
+                <p><strong>{{trainName}}</strong></p>
+            </div>
+            <div class="info-row">
+                <p>Train No:</p>
+                <p><strong>{{trainNumber}}</strong></p>
+            </div>
+            <div class="info-row">
+                <p>From:</p>
+                <p><strong>{{from}}</strong></p>
+            </div>
+            <div class="info-row">
+                <p>To:</p>
+                <p><strong>{{to}}</strong></p>
+            </div>
+
+            <div class="ticket-divider"></div>
+
+            <h3>Seat & Cost</h3>
+            <div class="info-row">
+                <p>Seat Type:</p>
+                <p><strong>{{seatType}}</strong></p>
+            </div>
+            <div class="info-row">
+                <p>Seats:</p>
+                <p><strong>{{selectedSeats}}</strong></p>
+            </div>
+            <div class="info-row">
+                <p>Total Cost:</p>
+                <p><strong>{{totalCost}} BDT</strong></p>
+            </div>
+
+            <div class="ticket-divider"></div>
+
+            <h3>Passenger Info</h3>
+            <div class="info-row">
+                <p>Name:</p>
+                <p><strong>{{userName}}</strong></p>
+            </div>
+            <div class="info-row">
+                <p>Email:</p>
+                <p><strong>{{userEmail}}</strong></p>
+            </div>
+        </div>
+
+        <div class="ticket-footer">
+            <p>Thank you for traveling with us!</p>
+            <p>For any query, contact <a href="mailto:support@cholojai.railway.gov.bd">support@cholojai.railway.gov.bd</a></p>
+        </div>
+    </div>
+</body>
+</html>
