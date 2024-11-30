@@ -1,5 +1,25 @@
 import React, { useState } from "react";
+/**
+ * Registration Component for registering a user with their details
+ * 
+ * This component allows the user to input their personal details such as name, email, phone, date of birth, address, and password for registration
+ * It validates the form and provides feedback based on the success or failure of the registration process
+ * 
+ * State Management:
+ * - formData: Stores the values of the form fields.
+ * - errorMessage: Stores any error message to be displayed to the user.
+ * - successMessage: Stores any success message to be displayed to the user.
+ * 
+ * Methods:
+ * - handleChange: Handles changes to the form fields and updates the formData state
+ * - handleSubmit: Submits the form, checks for validation, and communicates with the backend
+ */
+
 const Registration = () => {
+/**
+* State to hold the form data (name, email, phone, dob, address, password, confirmPassword).
+* @type {Object}
+*/
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -10,9 +30,25 @@ const Registration = () => {
     confirmPassword: "",
   });
 
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+/**
+* State to hold the error message when the form submission fails
+* @type {string}
+*/
 
+  const [errorMessage, setErrorMessage] = useState("");
+
+/**
+* State to hold the success message when the form submission is successful
+* @type {string}
+*/
+  
+  const [successMessage, setSuccessMessage] = useState("");
+  
+/**
+* Handles input changes in the form fields and updates the formData state 
+* @param {React.ChangeEvent<HTMLInputElement>} e - The input event.
+*/
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -20,7 +56,17 @@ const Registration = () => {
       [name]: value,
     }));
   };
-
+  
+/**
+* Handles the form submission
+* It performs the following:
+* 1. Validates the passwords match
+* 2. Sends a POST request to the backend with the form data
+* 3. Handles the response from the backend and updates the UI with a success or error message
+* @param {React.FormEvent<HTMLFormElement>} e - The submit event
+* @returns {Promise<void>} - A promise that resolves when the form submission is complete
+*/
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
