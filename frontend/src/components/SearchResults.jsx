@@ -2,24 +2,30 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const SearchResults = () => {
+  // Hook to access the location object, which contains the state passed to this component
   const location = useLocation();
+  // Hook to navigate to different routes
   const navigate = useNavigate();
+  
+  // Destructure the 'results' from the location state, defaulting to an empty array if no results are found
   const { results } = location.state || { results: [] };
 
+  // Function to handle a click on a train, navigating to the detailed train information page
   const handleTrainClick = (trainNumber) => {
-    navigate(`/trainInfo/${trainNumber}`);
+    navigate(`/trainInfo/${trainNumber}`);  // Navigate to the train info page based on the train number
   };
 
+  // Function to handle selecting seats, navigating to the seat selection page with necessary details
   const handleSelectSeats = (result) => {
     navigate("/seat-selection", {
       state: {
-        trainName: result.trainName,
-        trainNumber: result.trainNumber,
-        boggyType: result.boggyType,
-        searchDate:result.searchDate,
-        price: result.ticketPrice,
-        from: result.from,
-        to: result.to,
+        trainName: result.trainName,  // Pass the train name to the seat selection page
+        trainNumber: result.trainNumber,  // Pass the train number to the seat selection page
+        boggyType: result.boggyType,  // Pass the boggy type (e.g., sleeper, AC) to the seat selection page
+        searchDate: result.searchDate,  // Pass the search date to the seat selection page
+        price: result.ticketPrice,  // Pass the ticket price to the seat selection page
+        from: result.from,  // Pass the departure station to the seat selection page
+        to: result.to,  // Pass the destination station to the seat selection page
       },
     });
   };
@@ -36,7 +42,7 @@ const SearchResults = () => {
             <div className="flex justify-between items-center">
               <div
                 className="text-lg font-semibold text-gray-800 cursor-pointer hover:underline"
-                onClick={() => handleTrainClick(result.trainNumber)}
+                onClick={() => handleTrainClick(result.trainNumber)} // Handle train click
               >
                 {result.trainName} <span className="text-gray-600">({result.trainNumber})</span>
               </div>
@@ -57,7 +63,7 @@ const SearchResults = () => {
             <div className="flex items-center justify-between mt-6">
               <div className="text-sm text-gray-500">Available Seats: {result.availableSeats}</div>
               <button
-                onClick={() => handleSelectSeats(result)}
+                onClick={() => handleSelectSeats(result)} // Handle seat selection click
                 className="px-4 py-2 bg-primary_green1 text-white font-semibold rounded hover:bg-primary_green2 transition-colors"
               >
                 &#2547; {result.ticketPrice}
@@ -66,6 +72,7 @@ const SearchResults = () => {
           </div>
         ))
       ) : (
+        // Message shown if there are no results
         <p className="text-center text-gray-600">No trains found for the selected route and date.</p>
       )}
     </div>
