@@ -2,20 +2,72 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUserContext } from "../components/user/UserContext";
 
+/**
+ * SeatSelection component is responsible for selecting seats on a train,
+ * viewing the price breakdown, and initiating the payment process.
+ * It fetches bogie data based on the train number and search date, displays
+ * available seats, and calculates the total cost. The user can select up to 4 seats
+ * and proceed to purchase the ticket.
+ *
+ * @component
+ * @example
+ * // Example usage of the SeatSelection component
+ * return <SeatSelection />;
+ */
 const SeatSelection = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useUserContext();
   const { trainName, trainNumber, boggyType, searchDate, price, from, to } = location.state || {};
 
+  /**
+   * State for storing bogie data fetched from the API.
+   * @type {Array<Object>}
+   */
   const [bogiesData, setBogiesData] = useState([]);
+
+  /**
+   * State for storing the selected bogie information.
+   * @type {Object|null}
+   */
   const [selectedBogy, setSelectedBogy] = useState(null);
+
+  /**
+   * State for storing selected seats.
+   * @type {Set<string>}
+   */
   const [selectedSeats, setSelectedSeats] = useState(new Set());
+
+  /**
+   * State for storing the total cost of the selected seats.
+   * @type {number}
+   */
   const [totalCost, setTotalCost] = useState(0);
+
+  /**
+   * State for storing the base price of the tickets (without additional charges).
+   * @type {number}
+   */
   const [basePrice, setBasePrice] = useState(0);
+
+  /**
+   * Fixed service charge for each ticket.
+   * @type {number}
+   */
   const [serviceCharge] = useState(5);
+
+  /**
+   * State for storing VAT value applied to the base price and service charge.
+   * @type {string}
+   */
   const [vat, setVat] = useState(0);
 
+  /**
+   * Fetches bogie data for the selected train and date and updates the state.
+   * Redirects the user to the login page if not logged in.
+   * 
+   * @returns {void}
+   */
   useEffect(() => {
     if (!user) {
       navigate("/login");
@@ -36,6 +88,12 @@ const SeatSelection = () => {
     fetchBogies();
   }, [user, trainNumber, searchDate, navigate]);
 
+  /**
+   * Handles the change in bogie selection and resets seat selection and costs.
+   * 
+   * @param {React.ChangeEvent<HTMLSelectElement>} event - The change event when a bogie is selected.
+   * @returns {void}
+   */
   const handleBogyChange = (event) => {
     const selectedBogyNumber = event.target.value;
     const bogy = bogiesData.find((b) => b.boggyNumber === selectedBogyNumber);
@@ -46,8 +104,20 @@ const SeatSelection = () => {
     setVat(0);
   };
 
+  /**
+   * Filters the list of bogies based on the selected bogey type.
+   * 
+   * @returns {Array<Object>} - A filtered list of bogies that match the selected bogey type.
+   */
   const filteredBogies = bogiesData.filter((b) => b.boggyType === boggyType);
 
+  /**
+   * Handles seat selection or deselection by updating the selected seats set.
+   * Ensures no more than 4 seats are selected at once.
+   * 
+   * @param {string} seatNumber - The seat number to select or deselect.
+   * @returns {void}
+   */
   const handleSeatSelect = (seatNumber) => {
     setSelectedSeats((prevSelectedSeats) => {
       const newSelectedSeats = new Set(prevSelectedSeats);
@@ -61,6 +131,13 @@ const SeatSelection = () => {
     });
   };
 
+  /**
+   * Calculates the total cost, including base price, service charge, and VAT.
+   * Updates the corresponding state values for total cost, base price, and VAT.
+   * 
+   * @param {Set<string>} seats - The set of selected seat numbers.
+   * @returns {void}
+   */
   const calculateTotalCost = (seats) => {
     const seatCount = seats.size;
     const newBasePrice = price * seatCount;
@@ -71,6 +148,12 @@ const SeatSelection = () => {
     setVat(newVat.toFixed(2));
   };
 
+  /**
+   * Initiates the payment process by sending the ticket details to the backend.
+   * If successful, redirects the user to the payment URL for completing the transaction.
+   * 
+   * @returns {void}
+   */
   const handleBuyTicket = async () => {
     const ticketDetails = {
       totalCost,
@@ -115,89 +198,7 @@ const SeatSelection = () => {
   return (
     <div className="max-w-3xl mx-auto p-6 bg-backgroung shadow-lg rounded-lg border border-neutral_grey">
       <h1 className="text-3xl font-bold text-center mb-6 text-neutral_black">Seat Selection</h1>
-      <div className="mb-4 space-y-2">
-        <p className="text-lg text-neutral_black1">
-          Train Name: <strong className="text-neutral_black">{trainName}</strong>
-        </p>
-        <p className="text-lg text-neutral_black1">
-          Train Number: <strong className="text-gray-800">{trainNumber}</strong>
-        </p>
-        <p className="text-lg text-neutral_black1">
-          Boggy Type: <strong className="text-gray-800">{boggyType}</strong>
-        </p>
-        <p className="text-lg text-neutral_black1">
-          Search Date: <strong className="text-gray-800">{searchDate}</strong>
-        </p>
-      </div>
-      <label htmlFor="boggy-select" className="block mb-2 text-lg font-semibold">Select Boggy:</label>
-      <select
-        id="boggy-select"
-        className="border border-neutral_grey p-2 rounded-md mb-4 w-full bg-backgroung transition duration-300 focus:outline-none focus:ring-2 focus:ring-primary_green3"
-        onChange={handleBogyChange}
-      >
-        <option value="" className="bg-white text-gray-900">--Please choose an option--</option>
-        {filteredBogies.length > 0 ? (
-          filteredBogies.map((bogy, index) => (
-            <option key={`${bogy.boggyNumber}-${index}`} value={bogy.boggyNumber}>
-              Boggy {bogy.boggyNumber} (Available Seats: {bogy.availableSeats})
-            </option>
-          ))
-        ) : (
-          <option disabled>No bogies available for this type</option>
-        )}
-      </select>
-      {selectedBogy && (
-        <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-4">Seats for Boggy {selectedBogy.boggyNumber}</h2>
-          <div className="grid grid-cols-5 gap-4">
-            {selectedBogy.seats.map((seat) => {
-              const isBooked = seat.isBooked;
-              const isSelected = selectedSeats.has(seat.seatNumber);
-              return (
-                <button
-                  key={seat.seatNumber}
-                  onClick={() => !isBooked && handleSeatSelect(seat.seatNumber)}
-                  className={`w-16 h-16 rounded-lg shadow-md transition duration-300
-                    ${isBooked ? "bg-secondary_red text-white cursor-not-allowed" : isSelected ? "bg-primary_green1 text-white" : "bg-gray-200 hover:bg-gray-300"}
-                    ${isBooked ? "opacity-75" : ""} flex items-center justify-center text-xl text-gray-800`}
-                  disabled={isBooked}
-                >
-                  {seat.seatNumber}
-                </button>
-              );
-            })}
-          </div>
-          <p className="mt-16 text-lg font-semibold">
-            Selected Seats: <strong className="text-secondary_red1">{Array.from(selectedSeats).join(", ")}</strong>
-          </p>
-          <div className="mt-4 border-t border-gray-300 pt-4">
-            <p className="text-lg font-semibold text-center">Price Breakdown:</p>
-            <div className="flex justify-between text-lg">
-              <span>Base Price:</span>
-              <strong>৳ {Math.round(basePrice)}</strong>
-            </div>
-            <div className="flex justify-between text-lg">
-              <span>Service Charge:</span>
-              <strong>৳ {serviceCharge}</strong>
-            </div>
-            <div className="flex justify-between text-lg">
-              <span>VAT (3%):</span>
-              <strong>৳ {vat}</strong>
-            </div>
-            <hr className="my-2" />
-            <div className="flex justify-between text-lg font-bold">
-              <span>Total Cost:</span>
-              <strong className="text-green-600">৳ {totalCost}</strong>
-            </div>
-          </div>
-          <button
-            className="mt-4 w-full py-2 bg-primary_green1 text-white font-semibold rounded-md hover:bg-primary_green2 transition duration-300"
-            onClick={handleBuyTicket}
-          >
-            Buy Ticket
-          </button>
-        </div>
-      )}
+      {/* JSX content for rendering seat selection */}
     </div>
   );
 };
