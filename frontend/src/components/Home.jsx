@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";  // Importing necessary React hooks
+import { useNavigate } from "react-router-dom";  // Importing the `useNavigate` hook from `react-router-dom` for navigation
 
 const Home = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+  const navigate = useNavigate();  // Initialize `navigate` for programmatic navigation
+  const [formData, setFormData] = useState({  // State to store the form data
     fromStation: "",
     toStation: "",
     travelDate: "",
     seatType: "",
   });
-  const [stationOptions] = useState([
+  
+  const [stationOptions] = useState([  // Predefined list of station options
     "Abdulpur",
 "Akkelpur",
 "Akhaura",
@@ -112,62 +113,67 @@ const Home = () => {
 "Rangpur",
 "Rajshahi",
   ]);
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState({
+
+  const [suggestions, setSuggestions] = useState([]);  // State to store the filtered suggestions based on user input
+  const [showSuggestions, setShowSuggestions] = useState({  // State to track which input field is showing suggestions
     fromStation: false,
     toStation: false,
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);  // State to track if the search is in progress
 
-  // Get today's date to set as the minimum travel date
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0];  // Get today's date to set it as the minimum date for the travel date field
 
+  // Function to handle input changes for the station fields (from and to stations)
   const handleStationChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
 
-    if (value) {
+    if (value) {  // If the user types something, filter station suggestions
       const filteredSuggestions = stationOptions.filter((station) =>
-        station.toLowerCase().startsWith(value.toLowerCase())
+        station.toLowerCase().startsWith(value.toLowerCase())  // Filter stations that start with the input value (case insensitive)
       );
-      setSuggestions(filteredSuggestions);
-      setShowSuggestions((prev) => ({ ...prev, [field]: true }));
+      setSuggestions(filteredSuggestions);  // Set the filtered suggestions
+      setShowSuggestions((prev) => ({ ...prev, [field]: true }));  // Show the suggestions dropdown
     } else {
-      setShowSuggestions((prev) => ({ ...prev, [field]: false }));
+      setShowSuggestions((prev) => ({ ...prev, [field]: false }));  // Hide the suggestions dropdown if input is cleared
     }
   };
 
+  // Function to handle selecting a suggestion
   const handleSelectSuggestion = (field, suggestion) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: suggestion,
+      [field]: suggestion,  // Update the form data with the selected suggestion
     }));
-    setShowSuggestions((prev) => ({ ...prev, [field]: false }));
+    setShowSuggestions((prev) => ({ ...prev, [field]: false }));  // Hide the suggestions dropdown
   };
 
+  // Function to handle blur event (when the input field loses focus)
   const handleBlur = (field) => {
     setTimeout(() => {
-      setShowSuggestions((prev) => ({ ...prev, [field]: false }));
+      setShowSuggestions((prev) => ({ ...prev, [field]: false }));  // Hide suggestions after a delay to allow for click events
     }, 200);
   };
 
+  // Function to handle the form submission (search for tickets)
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const { fromStation, toStation, travelDate, seatType } = formData;
+    e.preventDefault();  // Prevent default form submission
+    setLoading(true);  // Set loading state to true
+    const { fromStation, toStation, travelDate, seatType } = formData;  // Extract form data
 
     try {
+      // Fetch ticket data from the API based on the form inputs
       const response = await fetch(
         `/api/tickets/search?from=${fromStation}&to=${toStation}&date=${travelDate}&type=${seatType}`
       );
-      const data = await response.json();
-      navigate("/results", { state: { results: data } });
+      const data = await response.json();  // Parse the response JSON
+      navigate("/results", { state: { results: data } });  // Navigate to the results page and pass the data
     } catch (error) {
-      console.error("Error fetching train data:", error);
+      console.error("Error fetching train data:", error);  // Log any errors that occur during the fetch
     } finally {
-      setLoading(false);
+      setLoading(false);  // Set loading state to false after the API call is finished
     }
   };
 
@@ -176,40 +182,33 @@ const Home = () => {
       <div className="container mx-auto p-6 mt-6 flex flex-col lg:flex-row justify-between items-center">
         <div className="w-full lg:w-1/2 mb-6 lg:mb-0">
           {loading ? (
-            <div className="loading-spinner">loading...</div>
+            <div className="loading-spinner">loading...</div>  // Display loading message while the data is being fetched
           ) : (
-            <form
-              className="bg-white p-8 rounded-lg shadow-md"
-              onSubmit={handleSubmit}
-            >
+            <form className="bg-white p-8 rounded-lg shadow-md" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="From Station"
                     className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary_green3"
-                    value={formData.fromStation}
-                    onChange={(e) =>
-                      handleStationChange("fromStation", e.target.value)
-                    }
-                    onBlur={() => handleBlur("fromStation")}
+                    value={formData.fromStation}  // Bind the value to the state
+                    onChange={(e) => handleStationChange("fromStation", e.target.value)}  // Update state on input change
+                    onBlur={() => handleBlur("fromStation")}  // Call handleBlur when input loses focus
                   />
-                  {showSuggestions.fromStation && (
+                  {showSuggestions.fromStation && (  // Show suggestions if applicable
                     <div className="absolute bg-white border rounded-md w-full mt-1 shadow-lg z-10 max-h-40 overflow-y-auto">
                       {suggestions.length ? (
                         suggestions.map((suggestion) => (
                           <div
                             key={suggestion}
-                            onClick={() =>
-                              handleSelectSuggestion("fromStation", suggestion)
-                            }
+                            onClick={() => handleSelectSuggestion("fromStation", suggestion)}  // Call handleSelectSuggestion when a suggestion is clicked
                             className="p-2 cursor-pointer hover:bg-gray-200"
                           >
-                            {suggestion}
+                            {suggestion} 
                           </div>
                         ))
                       ) : (
-                        <div className="p-2">No suggestions</div>
+                        <div className="p-2">No suggestions</div>  // Display message if no suggestions found
                       )}
                     </div>
                   )}
@@ -221,27 +220,23 @@ const Home = () => {
                     placeholder="To Station"
                     className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary_green3"
                     value={formData.toStation}
-                    onChange={(e) =>
-                      handleStationChange("toStation", e.target.value)
-                    }
-                    onBlur={() => handleBlur("toStation")}
+                    onChange={(e) => handleStationChange("toStation", e.target.value)}  // Update state on input change
+                    onBlur={() => handleBlur("toStation")}  // Call handleBlur when input loses focus
                   />
-                  {showSuggestions.toStation && (
+                  {showSuggestions.toStation && (  // Show suggestions if applicable
                     <div className="absolute bg-white border rounded-md w-full mt-1 shadow-lg z-10 max-h-40 overflow-y-auto">
                       {suggestions.length ? (
                         suggestions.map((suggestion) => (
                           <div
                             key={suggestion}
-                            onClick={() =>
-                              handleSelectSuggestion("toStation", suggestion)
-                            }
+                            onClick={() => handleSelectSuggestion("toStation", suggestion)}  // Call handleSelectSuggestion when a suggestion is clicked
                             className="p-2 cursor-pointer hover:bg-gray-200"
                           >
-                            {suggestion}
+                            {suggestion} 
                           </div>
                         ))
                       ) : (
-                        <div className="p-2">No suggestions</div>
+                        <div className="p-2">No suggestions</div>  // Display message if no suggestions found
                       )}
                     </div>
                   )}
@@ -253,25 +248,19 @@ const Home = () => {
                   type="date"
                   name="travelDate"
                   className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary_green3"
-                  value={formData.travelDate}
-                  onChange={(e) =>
-                    handleStationChange("travelDate", e.target.value)
-                  }
-                  min={today}
+                  value={formData.travelDate}  // Bind the value to the state
+                  onChange={(e) => handleStationChange("travelDate", e.target.value)}  // Update state on input change
+                  min={today}  // Set the minimum allowed date to today
                   required
                 />
                 <select
                   name="seatType"
                   className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary_green3"
-                  value={formData.seatType}
-                  onChange={(e) =>
-                    handleStationChange("seatType", e.target.value)
-                  }
+                  value={formData.seatType}  // Bind the value to the state
+                  onChange={(e) => handleStationChange("seatType", e.target.value)}  // Update state on input change
                   required
                 >
-                  <option value="" disabled>
-                    Select Seat Type
-                  </option>
+                  <option value="" disabled>Select Seat Type</option>  // Default option prompting the user to select a seat type
                   <option value="AC_B">AC_B</option>
                   <option value="AC_S">AC_S</option>
                   <option value="SNIGDHA">SNIGDHA</option>
@@ -289,7 +278,7 @@ const Home = () => {
                 type="submit"
                 className="w-full p-3 bg-[#21A75C] hover:bg-[#1b9450] text-white rounded-md transition-colors"
               >
-                Search Trains
+                Search Trains  
               </button>
             </form>
           )}
@@ -305,7 +294,8 @@ const Home = () => {
       </div>
 
       <div className="bg-white dark:bg-background p-6 rounded-lg shadow-md">
-        <div className="flex justify-around mb-8 ">
+        <div className="flex justify-around mb-8">
+          {/* Instructions */}
           <div className="text-center">
             <img
               aria-hidden="true"
