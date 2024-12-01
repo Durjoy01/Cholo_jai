@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "test": "jest"
+    
   },
   "type": "module",
   "keywords": [],
@@ -23,9 +25,5 @@
 }
 
 
-{
-  "scripts": {
-    "test": "jest"
-  }
-}
+
 
