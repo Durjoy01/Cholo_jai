@@ -1,20 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+/**
+ * Payment component that handles the payment status display and ticket creation.
+ * It checks for the payment status in the URL query parameters and, if successful, 
+ * makes an API call to create a ticket, then redirects the user to the home page.
+ * 
+ * @component
+ * @example
+ * // Example usage of the Payment component:
+ * return <Payment />;
+ */
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  /**
+   * State variable to store the status message indicating whether the payment 
+   * was successful or failed.
+   * @type {string}
+   */
   const [statusMessage, setStatusMessage] = useState("");
 
-  // Parse query parameters from URL and make API call if payment is successful
+  /**
+   * useEffect hook that runs when the component is mounted. It:
+   * - Parses the query parameters to check the payment status.
+   * - Displays the corresponding status message ("Payment Successful!" or "Payment Failed").
+   * - If payment is successful, it sends the payment details to the server to create a ticket.
+   * - Redirects the user to the home page after 5 seconds.
+   * 
+   * @returns {void}
+   */
   useEffect(() => {
+    // Parse the query parameters from the URL
     const queryParams = new URLSearchParams(location.search);
     const status = queryParams.get("status");
 
+    // Check if the payment was successful
     if (status === "success") {
       setStatusMessage("Payment Successful!");
 
-      // Extracting purchase details from query parameters (still needed for the API call)
+      // Extract payment details from the query parameters
       const details = {
         totalCost: queryParams.get("totalCost"),
         userId: queryParams.get("userId"),
@@ -29,7 +55,7 @@ const Payment = () => {
         selectedSeats: JSON.parse(queryParams.get("selectedSeats")),
       };
 
-      // API call to create the ticket
+      // Make an API request to create the ticket on the server
       fetch("http://localhost:5000/api/tickets/purchase", {
         method: "POST",
         headers: {
@@ -57,14 +83,16 @@ const Payment = () => {
           console.error("Error creating ticket:", error);
         });
     } else {
+      // If the payment failed
       setStatusMessage("Payment Failed. Please try again.");
     }
 
-    // Redirect to home page after 5 seconds
+    // Set up a timeout to redirect the user to the home page after 5 seconds
     const redirectTimeout = setTimeout(() => {
       navigate("/");
     }, 5000);
 
+    // Cleanup function to clear the timeout when the component unmounts
     return () => clearTimeout(redirectTimeout);
   }, [location.search, navigate]);
 
