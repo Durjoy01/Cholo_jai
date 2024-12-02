@@ -13,7 +13,7 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="w-64 bg-gray-800 text-white p-6">
+    <aside className="w-64 bg-gray-800 text-white h-screen p-6">
       <Link to="/" className="flex items-center mb-10">
         <img src="/whitelogo.png" alt="Logo" className="h-10 mr-2" />
       </Link>
